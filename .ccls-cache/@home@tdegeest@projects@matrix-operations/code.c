@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #define MAX_MATRIX 2
 #define MAX_SIZE 10
 
@@ -48,34 +49,45 @@ int getWidth(int index_matrix) {
   return matrix_sizes[index_matrix][1];
 }
 
-void view_matrix(int index_matrix) {
-  for (int outer = 0; outer < current_size; outer++) {
-    for (int inner = 0; inner < current_size; inner++) {
+void view_matrix(int index_matrix, int spaces) {
+  int width = getWidth(index_matrix);
+  int height = getHeight(index_matrix);
 
+  for (int vertical = 0; vertical < height * 2 + 1; vertical++) {
+
+    for (int space = 0; space < spaces; space++) {
+      printf(" ");
     }
-  }
-}
 
-void view_operation(char operation) {
-  int highest_heigth = 0;
-  for (int i = 0; i < nbr_matrix; i++) {
-    int height = getHeight(i);
-    if (height > highest_heigth) {
-      highest_heigth = height;
-    }
-  }
+    for (int horizontal = 0; horizontal < (width + 1) * 4; horizontal++) {
 
-  int matrix1_width = getWidth(0);
-  printf("%d\n", matrix1_width);
+      if (horizontal == 4) {
+        if (vertical % 2 == 0) {
+          printf("  ");
+        } else {
+          printf(" ");
+        }
+      }
 
-  for (int vertical = 0; vertical < highest_heigth * 2 + 1; vertical++) {
-
-    for (int matrix1 = 0; matrix1 < (matrix1_width + 1) * 4; matrix1++) {
-      if (vertical % 2 == 1 && matrix1 % 4 == 0 && matrix1 != 0) {
-        printf("X");
-      } else if (matrix1 == 1 || matrix1 == 15) {
-        printf("│");
-      } else {
+      if (vertical % 2 == 1 && horizontal % 4 == 0 && horizontal != 0) {
+        printf("%-4d", matrix[index_matrix][vertical / 2][horizontal / 4 - 1]);
+      } else if (horizontal == 1) {
+        if (vertical == 0) {
+          printf("┌");
+        } else if (vertical == height * 2) {
+          printf("└");
+        } else {
+          printf("│");
+        }
+      } else if (horizontal == (width + 1) * 4 - 1 ) {
+        if (vertical == 0) {
+          printf("┐");
+        } else if (vertical == height * 2) {
+          printf("┘");
+        } else {
+          printf("│");
+        }
+      } else if(vertical % 2 != 1 || horizontal == 0 || horizontal == 2 || horizontal == 3) {
         printf(" ");
       }
     }
@@ -83,21 +95,113 @@ void view_operation(char operation) {
     printf("\n");
 
   }
+
+}
+
+void view_operation(char operator) {
+  int width1 = getWidth(0);
+  int width2 = getWidth(1);
+  int avgWidth = (width1 + width2) / 2;
+  int diffWidth1 = width2 - width1;
+  int diffWidth2 = width1 - width2;
+  int absWidth = abs(diffWidth1);
+  int biggestWidth;
+  if (width1 > width2) {
+    biggestWidth = width1;
+  } else {
+    biggestWidth = width2;
+  }
+  int diffResult = biggestWidth - getWidth(2);
+
+  //print first matrix
+
+  view_matrix(0 ,diffWidth1 * 2);
+
+
+  //print operator
+
+  for (int i = 0; i < 3; i++) {
+    printf(" ");
+  }
+  for (int j = 0; j < biggestWidth * 2; j++) {
+    printf(" ");
+  }
+
+  printf("%c\n", operator);
+
+
+  //print second  matrix 
+
+  view_matrix(1, diffWidth2 * 2);
+
+
+  //print equal sign
+
+  for (int i = 0; i < 3; i++) {
+    printf(" ");
+  }
+  for (int j = 0; j < biggestWidth * 2; j++) {
+    printf(" ");
+  }
+
+  printf("=\n");
+
+
+  //print result matrix
+
+
+  view_matrix(2, diffResult * 2);
+
 }
 
 void add_values_matrix(int index_matrix) {
-  printf("%d\n", index_matrix);
+  int height = getHeight(index_matrix);
+  int width = getWidth(index_matrix);
+
+  for (int i = 0; i < height; i++) {
+    for (int j = 0; j < width; j++) {
+      int value;
+      scanf(" %d", &value);
+      matrix[index_matrix][i][j] = value; 
+    }
+  }
+}
+
+void calculate_add() {
+  int height = getHeight(0);
+  int width = getWidth(0);
+
+  for (int i = 0; i < height; i++) {
+    for (int j = 0; j < width; j++) {
+      int value = matrix[0][i][j] + matrix[1][i][j];
+      matrix[2][i][j] = value;
+    }
+  }
 }
 
 void add_matrix() {
-  printf("How many matrices would you like to add? ");
-  scanf(" %d", &nbr_matrix);
+  int height = 0;
+  int width = 0;
+  printf("What is the size of the the matrices? (n x m) = ");
+  scanf(" %d %d", &height, &width);
   printf("\n");
 
-  if (nbr_matrix > 1 && nbr_matrix <= MAX_MATRIX) {
-    for (int i = 0; i < nbr_matrix; i++) {
-      add_values_matrix(i);
-    }
+  if (height > 0 && width > 0) {
+
+    matrix_sizes[0][0] = height;
+    matrix_sizes[0][1] = width;
+    matrix_sizes[1][0] = height;
+    matrix_sizes[1][1] = width;
+    matrix_sizes[2][0] = height;
+    matrix_sizes[2][1] = width;
+
+    printf("Values of the first matrix\n");
+    add_values_matrix(0);
+    printf("Values of the second matrix\n");
+    add_values_matrix(1);
+
+    calculate_add();
+
   } else {
     printf("Invalid input, please try again.\n\n");
     add_matrix();
@@ -105,6 +209,34 @@ void add_matrix() {
 }
 
 void multiply_matrix() {
+  int height1 = 0;
+  int width1 = 0;
+  int height2 = 0;
+  int width2 = 0;
+  printf("What is the size of the the matrices? n x m and m x p = ");
+  scanf(" %d %d %d %d", &height1, &width1, &height2, &width2);
+  printf("\n");
+
+  if (width1 == height2 && height1 > 0 && width1 > 0 && height2 > 0 && width2 > 0) {
+
+    matrix_sizes[0][0] = height1;
+    matrix_sizes[0][1] = width1;
+    matrix_sizes[1][0] = height2;
+    matrix_sizes[1][1] = width2;
+    matrix_sizes[2][0] = height1;
+    matrix_sizes[2][1] = width2;
+
+    printf("Values of the first matrix\n");
+    add_values_matrix(0);
+    printf("Values of the second matrix\n");
+    add_values_matrix(1);
+
+    calculate_add();
+
+  } else {
+    printf("Invalid input, please try again.\n\n");
+    add_matrix();
+  }
 
 }
 
@@ -136,7 +268,21 @@ int main (int argc, char *argv[])
 {
   init_matrices();
   init_sizes();
-  view_operation('x');
-  loop();
+  ask_action();
+  // matrix_sizes[0][0] = 4;
+  // matrix[0][0][0] = 1;
+  // matrix[0][0][1] = 2;
+  // matrix[0][0][2] = 111;
+  // matrix[0][1][0] = 4;
+  // matrix[0][1][1] = 5;
+  // matrix[0][1][2] = 6;
+  // matrix[0][2][0] = 7;
+  // matrix[0][2][1] = 8;
+  // matrix[0][2][2] = 9;
+  // matrix[0][3][0] = 10;
+  // matrix[0][3][1] = 11;
+  // matrix[0][3][2] = 12;
+  view_operation('+');
+  // loop();
   return 0;
 }
