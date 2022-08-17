@@ -201,6 +201,8 @@ void add_matrix() {
 
     calculate_add();
 
+    view_operation('+');
+
   } else {
     printf("Invalid input, please try again.\n\n");
     add_matrix();
@@ -256,6 +258,8 @@ void multiply_matrix() {
 
     calculate_multiply();
 
+    view_operation('*');
+
   } else {
     printf("Invalid input, please try again.\n\n");
     add_matrix();
@@ -292,7 +296,6 @@ int main (int argc, char *argv[])
   init_matrices();
   init_sizes();
   ask_action();
-  view_operation('*');
   // loop();
   return 0;
 }
