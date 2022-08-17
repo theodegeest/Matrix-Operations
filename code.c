@@ -104,7 +104,6 @@ void view_operation(char operator) {
   int avgWidth = (width1 + width2) / 2;
   int diffWidth1 = width2 - width1;
   int diffWidth2 = width1 - width2;
-  int absWidth = abs(diffWidth1);
   int biggestWidth;
   if (width1 > width2) {
     biggestWidth = width1;
@@ -208,6 +207,30 @@ void add_matrix() {
   }
 }
 
+void calculate_multiply() {
+  int height = getHeight(2);
+  int width = getWidth(2);
+
+  for (int result_vertical = 0; result_vertical < height; result_vertical++) {
+    for (int result_horizontal = 0; result_horizontal < width; result_horizontal++) {
+      int value = 0;
+
+      // Calculate value
+
+      for (int i = 0; i < getWidth(0); i++) {
+        value+= matrix[0][result_vertical][i] * matrix[1][i][result_horizontal];
+      }
+
+
+
+      //Put it into result matrix
+
+      matrix[2][result_vertical][result_horizontal] = value;
+
+    }
+  }
+}
+
 void multiply_matrix() {
   int height1 = 0;
   int width1 = 0;
@@ -231,7 +254,7 @@ void multiply_matrix() {
     printf("Values of the second matrix\n");
     add_values_matrix(1);
 
-    calculate_add();
+    calculate_multiply();
 
   } else {
     printf("Invalid input, please try again.\n\n");
@@ -269,20 +292,7 @@ int main (int argc, char *argv[])
   init_matrices();
   init_sizes();
   ask_action();
-  // matrix_sizes[0][0] = 4;
-  // matrix[0][0][0] = 1;
-  // matrix[0][0][1] = 2;
-  // matrix[0][0][2] = 111;
-  // matrix[0][1][0] = 4;
-  // matrix[0][1][1] = 5;
-  // matrix[0][1][2] = 6;
-  // matrix[0][2][0] = 7;
-  // matrix[0][2][1] = 8;
-  // matrix[0][2][2] = 9;
-  // matrix[0][3][0] = 10;
-  // matrix[0][3][1] = 11;
-  // matrix[0][3][2] = 12;
-  view_operation('+');
+  view_operation('*');
   // loop();
   return 0;
 }
