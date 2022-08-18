@@ -243,10 +243,17 @@ void view_operation(char operator, int scalair) {
 /* Memory funtions */
 void memory_view() {
 
+  printf("\n");
+
   for (int index = 0; index < MAX_MATRIX; index++) {
-    printf("Address %d: %d x %d matrix\n", index, getHeight(index), getWidth(index));
-    view_matrix(index, 0);
-    printf("\n");
+    if (matrix_sizes[index][0] > 0) {
+      printf("Address %d: %d x %d matrix\n", index, getHeight(index), getWidth(index));
+      view_matrix(index, 0);
+      printf("\n");
+    } else {
+      printf("Address %d: scalair\n", index);
+      view_scalair(index, 6);
+    }
   }
 }
 
@@ -292,7 +299,16 @@ void memory_add() {
 
 
     } else if (type == 's') {
+      int value;
       printf("What is the value of the scalair?\n");
+      scanf(" %d", &value);
+
+      matrix_sizes[address][0] = 0;
+      matrix_sizes[address][1] = 0;
+      matrix[address][0][0] = value;
+
+      printf("Memory address %d has been overwritten with:\n", address);
+      view_scalair(address, 6);
 
     } else {
       printf("Unknown values, please try again\n");
@@ -389,20 +405,6 @@ void memory_swap() {
   }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-void add_values_matrix(int index_matrix) {
-  int height = getHeight(index_matrix);
-  int width = getWidth(index_matrix);
-
-  for (int i = 0; i < height; i++) {
-    for (int j = 0; j < width; j++) {
-      int value;
-      scanf(" %d", &value);
-      matrix[index_matrix][i][j] = value; 
-    }
-  }
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* Calculate funtions */
 
@@ -482,90 +484,70 @@ void action_multiply() {
 }
 
 
-void calculate_multiply_scalair() {
-  int height = getHeight(0);
-  int width = getWidth(0);
+void calculate_multiply_scalair(int x, int y, int output) {
+
+  int height = getHeight(x);
+  int width = getWidth(x);
+
+  matrix_sizes[output][0] = height;
+  matrix_sizes[output][1] = width;
 
   for (int i = 0; i < height; i++) {
     for (int j = 0; j < width; j++) {
-      int value = matrix[0][i][j] * matrix[1][0][0];
-      matrix[2][i][j] = value;
+      int value = matrix[x][i][j] * matrix[y][0][0];
+      matrix[output][i][j] = value;
     }
   }
 }
 
 void action_multiply_scalair() {
-  int height1 = 0;
-  int width1 = 0;
-  printf("What is the size of the the matrix? n x m = ");
-  scanf(" %d %d", &height1, &width1);
-  printf("\n");
 
-  if (height1 > 0 && width1 > 0) {
+  int x = -1;
+  int y = -1;
+  int output;
+  printf("What matrix and scalair would you like to multiply and where do you want to store it? x y output = ");
+  scanf(" %d %d %d", &x, &y, &output);
 
-    matrix_sizes[0][0] = height1;
-    matrix_sizes[0][1] = width1;
-    matrix_sizes[1][0] = 1;
-    matrix_sizes[1][1] = 1;
-    matrix_sizes[2][0] = height1;
-    matrix_sizes[2][1] = width1;
-
-    printf("Values of the matrix\n");
-    add_values_matrix(0);
-    printf("Value of the scalair\n");
-    add_values_matrix(1);
-
-    calculate_multiply_scalair();
-
-    view_operation('*', 1);
-
+  if (x >= 0 && y >= 0  && getWidth(x) > 0 && getWidth(y) == 0 && getHeight(x) > 0 && getHeight(y) == 0) {
+    calculate_multiply_scalair(x, y, output);
+  } else if (x >= 0 && y >= 0  && getWidth(x) == 0 && getWidth(y) > 0 && getHeight(x) == 0 && getHeight(y) > 0) {
+    calculate_multiply_scalair(y, x, output);
   } else {
-    printf("Invalid input, please try again.\n\n");
     action_multiply_scalair();
   }
-
 }
 
-void calculate_transpose() {
-  int height = getHeight(0);
-  int width = getWidth(0);
+void calculate_transpose(int x, int output) {
+  int height = getHeight(x);
+  int width = getWidth(x);
+
+  matrix_sizes[output][0] = width;
+  matrix_sizes[output][1] = height;
 
   for (int i = 0; i < height; i++) {
     for (int j = 0; j < width; j++) {
-      int value = matrix[0][i][j];
-      matrix[2][j][i] = value;
+      int value = matrix[x][i][j];
+      matrix[output][j][i] = value;
     }
   }
 }
 
 void action_transpose() {
-  int height1 = 0;
-  int width1 = 0;
-  printf("What is the size of the the matrix? n x m = ");
-  scanf(" %d %d", &height1, &width1);
+
+  int x = -1;
+  int output = -1;
+  printf("What matrix would you like to transpose and where would you like to store it? x output = ");
+  scanf(" %d %d", &x, &output);
   printf("\n");
 
-  if (height1 > 0 && width1 > 0) {
-
-    matrix_sizes[0][0] = height1;
-    matrix_sizes[0][1] = width1;
-    matrix_sizes[2][0] = width1;
-    matrix_sizes[2][1] = height1;
-
-    printf("Values of the matrix\n");
-    add_values_matrix(0);
-
-    calculate_transpose();
-
-    view_transpose();
-
+  if (x >= 0 && output >= 0) {
+    calculate_transpose(x, output);
   } else {
-    printf("Invalid input, please try again.\n\n");
     action_transpose();
   }
-
 }
 
+/* Loop functions */
 
 
 void ask_action() {
@@ -618,7 +600,6 @@ int main (int argc, char *argv[])
 {
   init_matrices();
   init_sizes();
-  // ask_action();
   loop();
   return 0;
 }
