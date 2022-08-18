@@ -100,13 +100,66 @@ void view_matrix(int index_matrix, int spaces) {
 void view_scalair(int index_matrix, int spaces) {
 
   printf("\n");
-  for (int i = 0; i < 3; i++) {
-    printf(" ");
+  if (matrix[1][0][0] > 99) {
+    printf("  ");
+  } else {
+    printf("   ");
   }
   for (int space = 0; space < spaces; space++) {
     printf(" ");
   }
   printf("%-4d\n\n", matrix[1][0][0]);
+}
+
+void view_transpose() {
+  int width1 = getWidth(0);
+  int width2 = getWidth(1);
+  int avgWidth = (width1 + width2) / 2;
+  int diffWidth1 = width2 - width1;
+  int diffWidth2 = width1 - width2;
+  int biggestWidth;
+  if (width1 > width2) {
+    biggestWidth = width1;
+  } else {
+    biggestWidth = width2;
+  }
+  int diffResult = biggestWidth - getWidth(2);
+
+  //print first matrix
+
+  view_matrix(0 ,diffWidth1 * 2);
+
+
+  //print operator
+
+  printf("\n");
+
+  for (int i = 0; i < 3; i++) {
+    printf(" ");
+  }
+  for (int j = 0; j < biggestWidth * 2; j++) {
+    printf(" ");
+  }
+
+  printf("T\n\n");
+
+  //print equal sign
+
+  for (int i = 0; i < 3; i++) {
+    printf(" ");
+  }
+  for (int j = 0; j < biggestWidth * 2; j++) {
+    printf(" ");
+  }
+
+  printf("=\n");
+
+
+  //print result matrix
+
+
+  view_matrix(2, diffResult * 2);
+
 }
 
 void view_operation(char operator, int scalair) {
@@ -326,11 +379,51 @@ void multiply_matrix_scalair() {
 
 }
 
+void calculate_transpose() {
+  int height = getHeight(0);
+  int width = getWidth(0);
+
+  for (int i = 0; i < height; i++) {
+    for (int j = 0; j < width; j++) {
+      int value = matrix[0][i][j];
+      matrix[2][j][i] = value;
+    }
+  }
+}
+
+void transpose_matrix() {
+  int height1 = 0;
+  int width1 = 0;
+  printf("What is the size of the the matrix? n x m = ");
+  scanf(" %d %d", &height1, &width1);
+  printf("\n");
+
+  if (height1 > 0 && width1 > 0) {
+
+    matrix_sizes[0][0] = height1;
+    matrix_sizes[0][1] = width1;
+    matrix_sizes[2][0] = width1;
+    matrix_sizes[2][1] = height1;
+
+    printf("Values of the matrix\n");
+    add_values_matrix(0);
+
+    calculate_transpose();
+
+    view_transpose();;
+
+  } else {
+    printf("Invalid input, please try again.\n\n");
+    transpose_matrix();
+  }
+
+}
+
 
 
 void ask_action() {
   char input;
-  printf("Action: (a) Add, (m) Multiply, (s) Multiply with scalair, ...\n");
+  printf("Action: (a) Add, (m) Multiply, (s) Multiply with scalair, (t) Transpose, ...\n");
   scanf(" %c", &input);
   switch (input) {
     case 'a':
@@ -341,6 +434,9 @@ void ask_action() {
       break;
     case 's':
       multiply_matrix_scalair();
+      break;
+    case 't':
+      transpose_matrix();
       break;
     default:
       printf("Unknown action, please try again.\n");
