@@ -195,6 +195,14 @@ void view_transpose(int x, int output) {
 
 }
 
+void view_determinant(int x, int output) {
+  printf("\n     det()\n\n");
+  view_matrix(x, 0);
+  printf("     =\n");
+  view_scalair(output, 5);
+
+}
+
 void view_operation(int x, int y, int output, char operator, int scalair) {
   int width1 = getWidth(x);
   int width2 = getWidth(y);
@@ -566,13 +574,42 @@ void action_transpose() {
   }
 }
 
+int calculate_determinant(int x, int output, int ctr, int current_width) {
+  int value = 0;
+  int sign = 1;
+
+  for (int i = 0; i < current_width; i++) {
+    value+= sign * matrix[x][0][i] * calculate_determinant(x, output, ctr + 1, current_width - 1);
+  }
+
+
+  return value;
+}
+
+void action_determinant() {
+
+  int x = -1;
+  int output = -1;
+  printf("What matrix would you like to calculate the determinant of and where would you like to store it? x output = ");
+  scanf(" %d %d", &x, &output);
+  printf("\n");
+
+  if (x >= 0 && output >= 0) {
+    calculate_determinant(x, output, 0, getWidth(x));
+    view_determinant(x, output);
+  } else {
+    action_determinant();
+  }
+
+}
+
 /* Loop functions */
 
 
 void ask_action() {
   char input;
   printf("Memory: (a) Add, (r) Remove, (s) Swap, (v) View\n");
-  printf("Actions: (A) Add, (M) Multiply, (S) Multiply with scalair, (T) Transpose, (q) Quit\n");
+  printf("Actions: (A) Add, (M) Multiply, (S) Multiply with scalair, (T) Transpose, (D) Determinant (q) Quit\n");
   scanf(" %c", &input);
   switch (input) {
     case 'a':
@@ -598,6 +635,9 @@ void ask_action() {
       break;
     case 'T':
       action_transpose();
+      break;
+    case 'D':
+      action_determinant();
       break;
     case 'q':
       run = 0;
