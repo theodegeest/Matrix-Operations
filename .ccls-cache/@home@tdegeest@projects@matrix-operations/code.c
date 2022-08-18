@@ -5,16 +5,30 @@
 #define DEFAULT_SIZE 3
 
 
-/*   n x m => n height, m width
- *
- *   ┌             ┐     ┌             ┐     ┌             ┐
- *   │  1   2   3  │     │  1   2   3  │     │  2   4   6  │
- *   │             │     │             │     │             │
- *   │  4   5   6  │  +  │  4   5   6  │  =  │  8   10  12 │  
- *   │             │     │             │     │             │
- *   │  7   8   9  │     │  7   8   9  │     │  14  16  18 │
- *   └             ┘     └             ┘     └             ┘
- *
+/* n x m => n height, m width
+      ┌               ┐
+      │   1   2   3   │
+      │               │
+      │   4   5   6   │
+      │               │
+      │   7   8   9   │
+      └               ┘
+              +
+      ┌               ┐
+      │   9   8   7   │
+      │               │
+      │   6   5   4   │
+      │               │
+      │   3   2   1   │
+      └               ┘
+              =
+      ┌               ┐
+      │   10  10  10  │
+      │               │
+      │   10  10  10  │
+      │               │
+      │   10  10  10  │
+      └               ┘
  */
 
 
@@ -130,9 +144,9 @@ void view_scalair(int index_matrix, int spaces) {
   printf("%-4d\n\n", matrix[1][0][0]);
 }
 
-void view_transpose() {
-  int width1 = getWidth(0);
-  int width2 = getWidth(1);
+void view_transpose(int x, int output) {
+  int width1 = getWidth(x);
+  int width2 = getWidth(output);
   int avgWidth = (width1 + width2) / 2;
   int diffWidth1 = width2 - width1;
   int diffWidth2 = width1 - width2;
@@ -142,11 +156,11 @@ void view_transpose() {
   } else {
     biggestWidth = width2;
   }
-  int diffResult = biggestWidth - getWidth(2);
+  // int diffResult = biggestWidth - getWidth(2);
 
   //print first matrix
 
-  view_matrix(0 ,diffWidth1 * 2);
+  view_matrix(x ,diffWidth1 * 2);
 
 
   //print operator
@@ -177,13 +191,13 @@ void view_transpose() {
   //print result matrix
 
 
-  view_matrix(2, diffResult * 2);
+  view_matrix(2, diffWidth2 * 2);
 
 }
 
-void view_operation(char operator, int scalair) {
-  int width1 = getWidth(0);
-  int width2 = getWidth(1);
+void view_operation(int x, int y, int output, char operator, int scalair) {
+  int width1 = getWidth(x);
+  int width2 = getWidth(y);
   int avgWidth = (width1 + width2) / 2;
   int diffWidth1 = width2 - width1;
   int diffWidth2 = width1 - width2;
@@ -193,11 +207,11 @@ void view_operation(char operator, int scalair) {
   } else {
     biggestWidth = width2;
   }
-  int diffResult = biggestWidth - getWidth(2);
+  int diffResult = biggestWidth - getWidth(output);
 
   //print first matrix
 
-  view_matrix(0 ,diffWidth1 * 2);
+  view_matrix(x ,diffWidth1 * 2);
 
 
   //print operator
@@ -215,9 +229,9 @@ void view_operation(char operator, int scalair) {
   //print second  matrix 
 
   if (scalair) {
-    view_scalair(1 ,biggestWidth * 2);
+    view_scalair(y ,biggestWidth * 2);
   } else {
-    view_matrix(1, diffWidth2 * 2);
+    view_matrix(y, diffWidth2 * 2);
   }
 
   //print equal sign
@@ -235,7 +249,7 @@ void view_operation(char operator, int scalair) {
   //print result matrix
 
 
-  view_matrix(2, diffResult * 2);
+  view_matrix(output, diffResult * 2);
 
 }
 
@@ -433,6 +447,7 @@ void action_add() {
 
   if (x >= 0 && y >= 0 && getWidth(x) == getWidth(y) && getHeight(x) == getHeight(y)) {
     calculate_add(x, y, output);
+    view_operation(x, y, output, '+', 0);
   } else {
     action_add();
   }
@@ -478,6 +493,7 @@ void action_multiply() {
 
   if (x >= 0 && y >= 0 && getWidth(x) == getHeight(y) && getWidth(x) > 0 && getWidth(y) > 0 && getHeight(x) > 0 && getHeight(y) > 0) {
     calculate_multiply(x, y, output);
+    view_operation(x, y, output, '*', 0);
   } else {
     action_multiply();
   }
@@ -510,8 +526,10 @@ void action_multiply_scalair() {
 
   if (x >= 0 && y >= 0  && getWidth(x) > 0 && getWidth(y) == 0 && getHeight(x) > 0 && getHeight(y) == 0) {
     calculate_multiply_scalair(x, y, output);
+    view_operation(x, y, output, '*', 1);
   } else if (x >= 0 && y >= 0  && getWidth(x) == 0 && getWidth(y) > 0 && getHeight(x) == 0 && getHeight(y) > 0) {
     calculate_multiply_scalair(y, x, output);
+    view_operation(y, x, output, '*', 1);
   } else {
     action_multiply_scalair();
   }
@@ -542,6 +560,7 @@ void action_transpose() {
 
   if (x >= 0 && output >= 0) {
     calculate_transpose(x, output);
+    view_transpose(x, output);
   } else {
     action_transpose();
   }
