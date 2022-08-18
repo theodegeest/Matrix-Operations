@@ -19,7 +19,6 @@
 
 
 int run = 1;
-int nbr_matrix = 2;
 
 int matrix[MAX_MATRIX][MAX_SIZE][MAX_SIZE];
 int matrix_sizes[MAX_MATRIX][2];
@@ -245,7 +244,7 @@ void view_operation(char operator, int scalair) {
 void memory_view() {
 
   for (int index = 0; index < MAX_MATRIX; index++) {
-    printf("Address %d: \n", index);
+    printf("Address %d: %d x %d matrix\n", index, getHeight(index), getWidth(index));
     view_matrix(index, 0);
     printf("\n");
   }
@@ -390,7 +389,7 @@ void memory_swap() {
   }
 }
 
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 void add_values_matrix(int index_matrix) {
   int height = getHeight(index_matrix);
   int width = getWidth(index_matrix);
@@ -403,56 +402,49 @@ void add_values_matrix(int index_matrix) {
     }
   }
 }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /* Calculate funtions */
 
-void calculate_add() {
-  int height = getHeight(0);
-  int width = getWidth(0);
+void calculate_add(int x, int y, int output) {
+  int height = getHeight(x);
+  int width = getWidth(x);
+
+  matrix_sizes[output][0] = height;
+  matrix_sizes[output][1] = width;
 
   for (int i = 0; i < height; i++) {
     for (int j = 0; j < width; j++) {
-      int value = matrix[0][i][j] + matrix[1][i][j];
-      matrix[2][i][j] = value;
+      int value = matrix[x][i][j] + matrix[y][i][j];
+      matrix[output][i][j] = value;
     }
   }
 }
 
 void action_add() {
-  int height = 0;
-  int width = 0;
-  printf("What is the size of the the matrices? (n x m) = ");
-  scanf(" %d %d", &height, &width);
-  printf("\n");
 
-  if (height > 0 && width > 0) {
+  int x = -1;
+  int y = -1;
+  int output;
+  printf("What matrices would you like to add up and where do you want to store it? x y output = ");
+  scanf(" %d %d %d", &x, &y, &output);
 
-    matrix_sizes[0][0] = height;
-    matrix_sizes[0][1] = width;
-    matrix_sizes[1][0] = height;
-    matrix_sizes[1][1] = width;
-    matrix_sizes[2][0] = height;
-    matrix_sizes[2][1] = width;
-
-    printf("Values of the first matrix\n");
-    add_values_matrix(0);
-    printf("Values of the second matrix\n");
-    add_values_matrix(1);
-
-    calculate_add();
-
-    view_operation('+', 0);
-
+  if (x >= 0 && y >= 0 && getWidth(x) == getWidth(y) && getHeight(x) == getHeight(y)) {
+    calculate_add(x, y, output);
   } else {
-    printf("Invalid input, please try again.\n\n");
     action_add();
   }
 }
 
-void calculate_multiply() {
-  int height = getHeight(2);
-  int width = getWidth(2);
+void calculate_multiply(int x, int y, int output) {
+
+  int height = getHeight(x);
+  int width = getWidth(y);
+
+  matrix_sizes[output][0] = height;
+  matrix_sizes[output][1] = width;
+
+  int iter = getWidth(x);
 
   for (int result_vertical = 0; result_vertical < height; result_vertical++) {
     for (int result_horizontal = 0; result_horizontal < width; result_horizontal++) {
@@ -460,52 +452,33 @@ void calculate_multiply() {
 
       // Calculate value
 
-      for (int i = 0; i < getWidth(0); i++) {
-        value+= matrix[0][result_vertical][i] * matrix[1][i][result_horizontal];
+      for (int i = 0; i < iter; i++) {
+        value+= matrix[x][result_vertical][i] * matrix[y][i][result_horizontal];
       }
 
 
 
       //Put it into result matrix
 
-      matrix[2][result_vertical][result_horizontal] = value;
+      matrix[output][result_vertical][result_horizontal] = value;
 
     }
   }
 }
 
 void action_multiply() {
-  int height1 = 0;
-  int width1 = 0;
-  int height2 = 0;
-  int width2 = 0;
-  printf("What is the size of the the matrices? n x m and m x p = ");
-  scanf(" %d %d %d %d", &height1, &width1, &height2, &width2);
-  printf("\n");
 
-  if (width1 == height2 && height1 > 0 && width1 > 0 && height2 > 0 && width2 > 0) {
+  int x = -1;
+  int y = -1;
+  int output;
+  printf("What matrices would you like to multiply and where do you want to store it? x y output = ");
+  scanf(" %d %d %d", &x, &y, &output);
 
-    matrix_sizes[0][0] = height1;
-    matrix_sizes[0][1] = width1;
-    matrix_sizes[1][0] = height2;
-    matrix_sizes[1][1] = width2;
-    matrix_sizes[2][0] = height1;
-    matrix_sizes[2][1] = width2;
-
-    printf("Values of the first matrix\n");
-    add_values_matrix(0);
-    printf("Values of the second matrix\n");
-    add_values_matrix(1);
-
-    calculate_multiply();
-
-    view_operation('*', 0);
-
+  if (x >= 0 && y >= 0 && getWidth(x) == getHeight(y) && getWidth(x) > 0 && getWidth(y) > 0 && getHeight(x) > 0 && getHeight(y) > 0) {
+    calculate_multiply(x, y, output);
   } else {
-    printf("Invalid input, please try again.\n\n");
     action_multiply();
   }
-
 }
 
 
