@@ -18,7 +18,6 @@
 
 int run = 1;
 int nbr_matrix = 2;
-int current_size = 0;
 
 int matrix[MAX_MATRIX + 1][MAX_SIZE][MAX_SIZE];
 int matrix_sizes[MAX_MATRIX + 1][2];
@@ -98,7 +97,19 @@ void view_matrix(int index_matrix, int spaces) {
 
 }
 
-void view_operation(char operator) {
+void view_scalair(int index_matrix, int spaces) {
+
+  printf("\n");
+  for (int i = 0; i < 3; i++) {
+    printf(" ");
+  }
+  for (int space = 0; space < spaces; space++) {
+    printf(" ");
+  }
+  printf("%-4d\n\n", matrix[1][0][0]);
+}
+
+void view_operation(char operator, int scalair) {
   int width1 = getWidth(0);
   int width2 = getWidth(1);
   int avgWidth = (width1 + width2) / 2;
@@ -131,8 +142,11 @@ void view_operation(char operator) {
 
   //print second  matrix 
 
-  view_matrix(1, diffWidth2 * 2);
-
+  if (scalair) {
+    view_scalair(1 ,biggestWidth * 2);
+  } else {
+    view_matrix(1, diffWidth2 * 2);
+  }
 
   //print equal sign
 
@@ -201,7 +215,7 @@ void add_matrix() {
 
     calculate_add();
 
-    view_operation('+');
+    view_operation('+', 0);
 
   } else {
     printf("Invalid input, please try again.\n\n");
@@ -258,19 +272,65 @@ void multiply_matrix() {
 
     calculate_multiply();
 
-    view_operation('*');
+    view_operation('*', 0);
 
   } else {
     printf("Invalid input, please try again.\n\n");
-    add_matrix();
+    multiply_matrix();
   }
 
 }
 
 
+void calculate_multiply_scalair() {
+  int height = getHeight(0);
+  int width = getWidth(0);
+
+  for (int i = 0; i < height; i++) {
+    for (int j = 0; j < width; j++) {
+      int value = matrix[0][i][j] * matrix[1][0][0];
+      matrix[2][i][j] = value;
+    }
+  }
+}
+
+void multiply_matrix_scalair() {
+  int height1 = 0;
+  int width1 = 0;
+  printf("What is the size of the the matrix? n x m = ");
+  scanf(" %d %d", &height1, &width1);
+  printf("\n");
+
+  if (height1 > 0 && width1 > 0) {
+
+    matrix_sizes[0][0] = height1;
+    matrix_sizes[0][1] = width1;
+    matrix_sizes[1][0] = 1;
+    matrix_sizes[1][1] = 1;
+    matrix_sizes[2][0] = height1;
+    matrix_sizes[2][1] = width1;
+
+    printf("Values of the matrix\n");
+    add_values_matrix(0);
+    printf("Value of the scalair\n");
+    add_values_matrix(1);
+
+    calculate_multiply_scalair();
+
+    view_operation('*', 1);
+
+  } else {
+    printf("Invalid input, please try again.\n\n");
+    multiply_matrix_scalair();
+  }
+
+}
+
+
+
 void ask_action() {
   char input;
-  printf("Action: (a) Add, (m) Multiply, ...\n");
+  printf("Action: (a) Add, (m) Multiply, (s) Multiply with scalair, ...\n");
   scanf(" %c", &input);
   switch (input) {
     case 'a':
@@ -279,8 +339,12 @@ void ask_action() {
     case 'm':
       multiply_matrix();
       break;
+    case 's':
+      multiply_matrix_scalair();
+      break;
     default:
       printf("Unknown action, please try again.\n");
+      ask_action();
       break;
   }
 }
