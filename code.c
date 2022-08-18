@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define MAX_MATRIX 4
+#define MAX_MATRIX 5
 #define MAX_SIZE 10
 #define DEFAULT_SIZE 3
 
